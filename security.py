@@ -44,13 +44,13 @@ def verificar_access_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
-        raise ValueError("Invalid token")
+        raise ValueError("Token invalido")
 
     user_id = payload.get("sub")
     user_rol = payload.get("rol")
 
     if user_id is None or user_rol is None:
-        raise ValueError("Invalid token")
+        raise ValueError("Token invalido")
 
     return {
         "id": user_id,
@@ -71,6 +71,6 @@ def get_usuario_actual(
 
 def get_admin_user(usuario_actual: dict) -> dict:
     if usuario_actual.get("rol") != "admin":
-        raise PermissionError("Insufficient permissions")
+        raise PermissionError("Permisos insuficientes")
 
     return usuario_actual
