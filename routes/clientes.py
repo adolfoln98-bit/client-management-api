@@ -1,23 +1,21 @@
-from fastapi import APIRouter, HTTPException, Query, Depends
-from services.clientes_service import(
-listar_clientes, 
-buscar_cliente_id,
-crear_nuevo_cliente_db,
-actualizar_cliente_db, 
-borrar_cliente_db,
-)
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-from models import (
-ClienteBase,
-ClienteOut,
-ClientesResponse,
-SortBy,
-OrderBy
-)
-from security import(
-    get_usuario_actual,
-)
 from dependencies.auth import requerir_admin
+from models import (
+    ClienteBase,
+    ClienteOut,
+    ClientesResponse,
+    OrderBy,
+    SortBy,
+)
+from security import get_usuario_actual
+from services.clientes_service import (
+    actualizar_cliente_db,
+    borrar_cliente_db,
+    buscar_cliente_id,
+    crear_nuevo_cliente_db,
+    listar_clientes,
+)
 
 
 clientes_router = APIRouter(
@@ -35,9 +33,9 @@ def get_clientes(
                 page: int = Query(1, ge=1),
                 sort_by: SortBy = SortBy.id,
                 order: OrderBy = OrderBy.asc,
-                usuario_actual = Depends(get_usuario_actual)
+                usuario_actual: dict = Depends(get_usuario_actual)
     ):
-    offset= (page-1)*limit
+    offset= (page-1) * limit
     usuario_id= int(usuario_actual["id"])
     try:
         resultado = listar_clientes (usuario_id= usuario_id,
@@ -57,7 +55,7 @@ def get_clientes(
     return resultado
 
 @clientes_router.get("/admin-test")
-def admin_test(admin= Depends(requerir_admin)):
+def admin_test(admin: dict= Depends(requerir_admin)):
         return {"mensaje": "Acceso admin permitido"}
     
 
