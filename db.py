@@ -1,15 +1,20 @@
-import sqlite3
 import os
+import sqlite3
+
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
 DB_PATH = os.getenv("DATABASE_URL", "data/clientes.db")
 
+
 def conn():
     conexion = sqlite3.connect(DB_PATH)
     conexion.row_factory = sqlite3.Row
     return conexion
+
+
 def init_db():
     with conn() as conexion:
         cursor = conexion.cursor()
@@ -36,4 +41,5 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_cliente_usuario_id
         ON clientes(usuario_id)
         """)
+
         conexion.commit()
