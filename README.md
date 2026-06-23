@@ -1,10 +1,22 @@
 # FastAPI Client Management API
 
-A REST API built with FastAPI that demonstrates authentication, authorization, resource ownership, validation, testing, and backend best practices.
+A REST API built with FastAPI that demonstrates authentication, authorization, resource ownership, validation, testing, and backend development best practices.
 
-## Features
+## API Features
 
-### Authentication & Security
+* User registration
+* JWT authentication
+* Protected endpoints
+* Role-Based Access Control (RBAC)
+* Resource ownership validation
+* Full CRUD operations
+* Filtering by name and age
+* Pagination
+* Sorting
+* Input validation with Pydantic
+* Automated testing
+
+## Authentication & Security
 
 * User registration
 * User login with JWT authentication
@@ -12,13 +24,13 @@ A REST API built with FastAPI that demonstrates authentication, authorization, r
 * Protected endpoints
 * Environment variable configuration
 
-### Authorization
+## Authorization
 
 * Role-based access control (RBAC)
 * User and admin roles
 * Resource ownership validation
 
-### Client Management
+## Client Management
 
 * Full CRUD operations
 * Filtering by name and age
@@ -26,7 +38,7 @@ A REST API built with FastAPI that demonstrates authentication, authorization, r
 * Sorting
 * Input validation with Pydantic
 
-### Testing
+## Testing
 
 * Automated tests with Pytest
 * Authentication tests
@@ -66,7 +78,7 @@ A REST API built with FastAPI that demonstrates authentication, authorization, r
 
 ```bash
 git clone <repository-url>
-cd fastapi-client-management-api
+cd client-management-api
 
 python -m venv .venv
 .venv\Scripts\activate
