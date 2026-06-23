@@ -29,11 +29,11 @@ A REST API built with FastAPI that demonstrates authentication, authorization, r
 ### Testing
 
 * Automated tests with Pytest
-* FastAPI TestClient
-* Fixtures and test isolation
 * Authentication tests
+* Authorization tests
 * Ownership tests
 * CRUD tests
+* Coverage reporting with pytest-cov
 
 ## Tech Stack
 
