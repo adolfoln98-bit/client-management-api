@@ -1,17 +1,20 @@
 from db import conn
 from models import ClienteBase, UsuarioCreate, UsuarioLogin
-from security import hashear_password, verificar_password, crear_access_token
+from security import (
+    crear_access_token,
+    hashear_password,
+    verificar_password,
+)
 
 
 
 def fila_a_cliente(fila):
     return dict(fila)
 
+#Funcion para trasformar los datos de la base de datos a json lejible por el codigo
 def db_a_json (lista_db):
-    resultado = []
-    for cliente in lista_db:
-        resultado.append(fila_a_cliente(cliente))
-    return resultado
+    return [fila_a_cliente(cliente) for cliente in lista_db]
+
 
 def construir_metadatos(data: list, total: int, limit: int, offset: int):
     return {
@@ -33,39 +36,40 @@ def construir_filtro_nombre(nombre: str):
     valores_nombre = []
 
     for valor in valores_limpios:
-        valor= valor.lower()
+        valor = valor.lower()
 
         if valor.startswith("*") and valor.endswith("*"):
             patron = f"%{valor[1:-1]}%"
         elif valor.startswith("*"):
-            patron= "%"+valor[1:]
+            patron = "%"+valor[1:]
         elif valor.endswith("*"):
-            patron= valor[:-1]+"%"
+            patron = valor[:-1]+"%"
         else:
-            patron= "%"+valor+"%"
+            patron = "%"+valor+"%"
 
         condiciones_nombre.append("LOWER(nombre) LIKE ?")
         valores_nombre.append(patron)
 
-    condicion_nombre= " OR ".join(condiciones_nombre)
+    condicion_nombre = " OR ".join(condiciones_nombre)
     condicion_nombre = f"({condicion_nombre})"
 
     return condicion_nombre, valores_nombre
 
 
 def construir_filtro_edad(edades):
+    #Limpiamos las edeades pasadoa de posibles errores como comas duplicadas o espacios tanto al inicio como en medio como al final del string
     try:
-        edad_filtrada = [int(v.strip()) for v in edades.split(",") if v.strip()]
+        edades_filtradas = [int(v.strip()) for v in edades.split(",") if v.strip()]
     except ValueError:
         raise ValueError("Valores introducidos no validos")
 
     
-    if not edad_filtrada:
+    if not edades_filtradas:
         return None, []
     
     condiciones_edad = []
 
-    for edad in edad_filtrada:
+    for edad in edades_filtradas:
         if edad <0:
             raise ValueError("La edad no puede ser menor que 0")
         if edad >120:
@@ -73,10 +77,10 @@ def construir_filtro_edad(edades):
         
         condiciones_edad.append("edad = ?")
 
-    condicion_edad= " OR ".join(condiciones_edad)
-    condicion_edad= f"({condicion_edad})"
+    condicion_edad = " OR ".join(condiciones_edad)
+    condicion_edad = f"({condicion_edad})"
 
-    return condicion_edad, edad_filtrada
+    return condicion_edad, edades_filtradas
 
 
 
@@ -88,8 +92,8 @@ def listar_clientes(
         edad_max: int = None,
         limit: int = 10,
         offset: int = 0,
-        sort_by: str= "id",
-        order: str="asc",
+        sort_by: str = "id",
+        order: str = "asc",
     ):
 
     query = "SELECT * FROM clientes"
@@ -229,7 +233,7 @@ def registrar_usuario(usuario: UsuarioCreate):
     hashed_pass = hashear_password(usuario.password)
 
     with conn() as conexion:
-        cursor= conexion.cursor()
+        cursor = conexion.cursor()
         cursor.execute("""
         SELECT id FROM usuarios WHERE email = ?
         """, (usuario.email,))
@@ -239,7 +243,7 @@ def registrar_usuario(usuario: UsuarioCreate):
         cursor.execute("""
         INSERT INTO usuarios (email, password_hash) values (?,?)
         """, (usuario.email, hashed_pass))
-        ultimo_id= cursor.lastrowid
+        ultimo_id = cursor.lastrowid
     return {
         "id": ultimo_id,
         "email": usuario.email
@@ -247,7 +251,7 @@ def registrar_usuario(usuario: UsuarioCreate):
 
 def login(usuario: UsuarioLogin):
     with conn() as conexion:
-        cursor= conexion.cursor()
+        cursor = conexion.cursor()
         cursor.execute("""
         SELECT id, password_hash, rol FROM usuarios WHERE email = ?
         """, (usuario.email,))
@@ -258,7 +262,7 @@ def login(usuario: UsuarioLogin):
         if not verificar_password(usuario.password, password_hash):
             raise ValueError("Credenciales incorrectas")
         
-        token= crear_access_token(resultado[0], resultado[2])
+        token = crear_access_token(resultado[0], resultado[2])
         return {
             "access_token": token,
             "token_type": "bearer"
