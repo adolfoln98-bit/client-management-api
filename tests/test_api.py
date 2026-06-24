@@ -417,3 +417,82 @@ def test_edad_min_mayor_edad_max(client, crear_usuario_test):
 
     assert response.status_code == 400
     assert response.json()["detail"] == "La edad minima no puede ser mayor a la edad maxima"
+
+def test_comodin_final(client, crear_usuario_test):
+    usuario= crear_usuario_test()
+    header = {
+        "Authorization": f"Bearer {usuario['access_token']}"
+    }
+
+    clientes = [
+    {"nombre": "Ana", "edad": 30},
+    {"nombre": "Anabel", "edad": 45},
+    {"nombre": "Mariana", "edad": 50},
+    {"nombre": "Rossy", "edad": 60},
+    {"nombre": "Jose", "edad":23}
+    ]
+    for cliente_data in clientes:
+        client.post("/api/clientes",json=cliente_data, headers = header)
+    
+    response = client.get("/api/clientes?nombre=ana*", headers = header)
+    data = response.json()["data"]
+
+    nombre_clientes = [cliente["nombre"] for cliente in data]
+
+    assert set(nombre_clientes) == {
+        "Ana",
+        "Anabel"
+    }
+
+def test_comodin_inicio(client, crear_usuario_test):
+    usuario= crear_usuario_test()
+    header = {
+        "Authorization": f"Bearer {usuario['access_token']}"
+    }
+
+    clientes = [
+    {"nombre": "Ana", "edad": 30},
+    {"nombre": "Anabel", "edad": 45},
+    {"nombre": "Mariana", "edad": 50},
+    {"nombre": "Rossy", "edad": 60},
+    {"nombre": "Jose", "edad":23}
+    ]
+    for cliente_data in clientes:
+        client.post("/api/clientes",json=cliente_data, headers = header)
+    
+    response = client.get("/api/clientes?nombre=*ana", headers = header)
+    data = response.json()["data"]
+
+    nombre_clientes = [cliente["nombre"] for cliente in data]
+
+    assert set(nombre_clientes) == {
+        "Ana",
+        "Mariana"
+    }
+
+def test_comodin_inicio_y_fin(client, crear_usuario_test):
+    usuario= crear_usuario_test()
+    header = {
+        "Authorization": f"Bearer {usuario['access_token']}"
+    }
+
+    clientes = [
+    {"nombre": "Ana", "edad": 30},
+    {"nombre": "Anabel", "edad": 45},
+    {"nombre": "Mariana", "edad": 50},
+    {"nombre": "Rossy", "edad": 60},
+    {"nombre": "Jose", "edad":23}
+    ]
+    for cliente_data in clientes:
+        client.post("/api/clientes",json=cliente_data, headers = header)
+    
+    response = client.get("/api/clientes?nombre=*ana*", headers = header)
+    data = response.json()["data"]
+
+    nombre_clientes = [cliente["nombre"] for cliente in data]
+
+    assert set(nombre_clientes) == {
+        "Ana",
+        "Anabel",
+        "Mariana"
+    }
