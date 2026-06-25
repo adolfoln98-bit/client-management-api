@@ -10,6 +10,11 @@ DB_PATH = os.getenv("DATABASE_URL", "data/clientes.db")
 
 
 def conn():
+    db_dir = os.path.dirname(DB_PATH)
+
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+
     conexion = sqlite3.connect(DB_PATH)
     conexion.row_factory = sqlite3.Row
     return conexion
